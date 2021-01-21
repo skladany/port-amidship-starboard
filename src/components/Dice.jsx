@@ -1,6 +1,13 @@
 import Die from "./Die";
 
-function Dice({ dice, setDice }) {
+function Dice({
+  dice,
+  setDice,
+  players,
+  setPlayers,
+  currentPlayerIndex,
+  setCurrentPlayerIndex,
+}) {
   const rollDice = function () {
     const numOfDice = dice.length;
 
@@ -23,6 +30,39 @@ function Dice({ dice, setDice }) {
     });
 
     setDice(rolls);
+    redistributeChips(rolls);
+  };
+
+  const redistributeChips = function (rolls) {
+    const portPlayerIndex =
+      currentPlayerIndex - 1 > 0 ? currentPlayerIndex - 1 : players.length - 1;
+    const starboardPlayer =
+      currentPlayerIndex + 1 < players.length ? currentPlayerIndex + 1 : 1;
+
+    // iterate thru rolls and redistribute
+    rolls.forEach((roll) => {
+      players[currentPlayerIndex].chips =
+        players[currentPlayerIndex].chips - 1 > 0
+          ? players[currentPlayerIndex].chips - 1
+          : 0;
+
+      switch (roll) {
+        case "P":
+          players[portPlayerIndex].chips++;
+          break;
+        case "A":
+          players[0].chips++;
+          break;
+        case "S":
+          players[starboardPlayer].chips++;
+          break;
+        default:
+      }
+    });
+
+    currentPlayerIndex =
+      currentPlayerIndex + 1 >= players.length ? 1 : currentPlayerIndex + 1;
+    setCurrentPlayerIndex(currentPlayerIndex);
   };
 
   return (
